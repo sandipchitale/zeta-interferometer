@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zeta-Zeros Interferometer</title>
+    <script type="module" crossorigin src="/zeta-spectroscope/assets/index-BPf9jzzL.js"></script>
+    <link rel="stylesheet" crossorigin href="/zeta-spectroscope/assets/index-C8QN1QJw.css">
+  </head>
+  <body>
+    <button id="sidebar-toggle" aria-label="Toggle explainer" title="Show / hide explainer">‹</button>
+
+    <aside id="sidebar">
+      <h1>The Zeta-Zeros Interferometer</h1>
+      <p class="tagline">A diffraction grating with one slit at each non-trivial zero
+        of&nbsp;ζ(s). Plane-wave light in &rarr; the far-field fringes land on the&nbsp;<b>primes</b>.</p>
+
+      <details class="card accent-cyan" open>
+        <summary>The idea</summary>
+        <p>The non-trivial zeros <code>½&nbsp;+&nbsp;iγ<sub>n</sub></code> and the primes are
+          <b>Fourier-dual</b> (Riemann's explicit formula). A grating <i>is</i> an optical
+          Fourier transform: under parallel illumination the screen shows
+          <code>|&nbsp;𝓕{slits}&nbsp;|²</code>.</p>
+        <p>Put a slit at each height <code>γ<sub>n</sub></code> and the bright fringes appear at
+          <code>v&nbsp;=&nbsp;log&nbsp;p<sup>k</sup></code> — the logarithms of the
+          <b>prime powers</b>.</p>
+      </details>
+
+      <details class="card accent-magenta" open>
+        <summary>Reading the screen</summary>
+        <ul class="legend-list">
+          <li><span class="color-box white"></span> Centre fringe <code>v=0</code> → label <b>1</b> (the zeroth order)</li>
+          <li><span class="color-box cyan"></span> Upper wing → <b>primes</b> <code>p</code> at <code>v=log p</code></li>
+          <li><span class="color-box yellow"></span> Faint marks → <b>prime powers</b> <code>p<sup>k</sup></code> (toggle)</li>
+          <li><span class="color-box magenta"></span> Lower wing → the mirror, labelled <b>1/p</b> (conjugate ±γ symmetry)</li>
+        </ul>
+      </details>
+
+      <details class="card accent-green" open>
+        <summary>Layout</summary>
+        <ul class="legend-list plain">
+          <li><b>Grating</b> = the critical line, <code>Re(s) = ½</code> — a plane ∥ the YZ
+            plane with a slit at each zero height <code>γ<sub>n</sub></code>.</li>
+          <li>Horizontal = <code>Re(s)</code>, vertical = <code>Im(s) = t</code>; the
+            <b>Y axis</b> is <code>Re = 0</code>.</li>
+          <li><b>Line source</b> at right (<code>x→+∞</code>); the <b>curved screen</b> at left
+            shows the far-field pattern.</li>
+        </ul>
+      </details>
+
+      <details class="card accent-green" open>
+        <summary>Try it</summary>
+        <p>Drag <b>“Zero pairs”</b> (or press <kbd>←</kbd>/<kbd>→</kbd>). With a few zeros the
+          pattern is <b>fuzzy</b>; as you add more zeros the prime fringes <b>sharpen</b> and lock
+          onto the labels — the explicit formula converging before your eyes.</p>
+      </details>
+
+      <details class="card accent-red">
+        <summary>Honest caveats</summary>
+        <ul class="legend-list plain">
+          <li>Spots sit at <b>prime powers</b> (so <code>4=2², 8=2³, 9=3²…</code> appear too).</li>
+          <li>Few zeros ⇒ broad, noisy peaks; needs many to resolve large primes.</li>
+          <li>Screen axis is <b>logarithmic</b> in the prime coordinate; uniform slits.</li>
+        </ul>
+      </details>
+    </aside>
+
+    <div id="app"></div>
+
+  </body>
+</html>
