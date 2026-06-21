@@ -150,3 +150,61 @@ canvas { display: block; }
 
 /* lil-gui sits top-right by default; nudge it below any future header */
 .lil-gui.root { z-index: 12; }
+
+/* Projection radio group injected into the lil-gui panel */
+#projection-radio {
+  display: flex;
+  align-items: center;
+  /* mirror a lil-gui controller row so the radios sit in the VALUE column */
+  padding: 7px var(--padding, 4px);
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(120, 130, 200, 0.25);
+}
+#projection-radio .pr-label {
+  min-width: var(--name-width, 45%);
+  flex-shrink: 0;
+  padding-right: var(--spacing, 4px);
+  font-weight: 700;
+  color: #9beaff;
+}
+#projection-radio .pr-options { display: flex; gap: 16px; }
+#projection-radio label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+#projection-radio input[type="radio"] { accent-color: #00ffff; cursor: pointer; margin: 0; }
+
+/* ViewCube navigation widget — card under the lil-gui panel */
+#view-cube {
+  position: fixed;
+  /* top/right set in JS to sit just below the lil-gui panel */
+  z-index: 12;
+  box-sizing: content-box; /* keep the canvas at its declared size; padding adds the card frame */
+  padding: 4px;
+  background: rgba(16, 16, 34, 0.85);
+  border: 1px solid rgba(120, 130, 200, 0.3);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+}
+#view-cube canvas { display: block; }
+
+#view-cube-home {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(120, 130, 200, 0.4);
+  border-radius: 6px;
+  background: rgba(16, 16, 34, 0.85);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: color 0.2s, background 0.2s;
+}
+#view-cube-home:hover { color: #fff; background: rgba(40, 42, 80, 0.95); }
