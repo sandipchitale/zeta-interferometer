@@ -17,8 +17,12 @@
         <summary>The idea</summary>
         <p>The non-trivial zeros <code>½&nbsp;+&nbsp;iγ<sub>n</sub></code> and the primes are
           <b>Fourier-dual</b> (Riemann's explicit formula). A grating <i>is</i> an optical
-          Fourier transform: under parallel illumination the screen shows
-          <code>|&nbsp;𝓕{slits}&nbsp;|²</code>.</p>
+          Fourier transform: under parallel illumination the far field is
+          <code>|&nbsp;𝓕{slits}&nbsp;|</code>. The screen here shows a
+          <b>tone-mapped amplitude</b> <code>|&nbsp;𝓕&nbsp;|<sup>γ</sup></code> (the
+          <b>Contrast</b> knob, <code>γ&nbsp;≈&nbsp;0.55</code>), not the squared intensity
+          <code>|&nbsp;𝓕&nbsp;|²</code> — squaring would crush the faint prime fringes into
+          the floor.</p>
         <p>Put a slit at each height <code>γ<sub>n</sub></code> and the bright fringes appear at
           <code>v&nbsp;=&nbsp;log&nbsp;p<sup>k</sup></code> — the logarithms of the
           <b>prime powers</b>.</p>
@@ -57,7 +61,18 @@
         <summary>Honest caveats</summary>
         <ul class="legend-list plain">
           <li>Spots sit at <b>prime powers</b> (so <code>4=2², 8=2³, 9=3²…</code> appear too).</li>
-          <li>Few zeros ⇒ broad, noisy peaks; needs many to resolve large primes.</li>
+          <li><b>Positions are exact; brightness isn't the formula's.</b> The explicit
+            formula weights each term by <code>Λ(n)/√n</code>; the uniform grating renders the
+            <i>unweighted</i> sum, so peak <i>heights</i> come from finite-<i>N</i> resonance,
+            not the true density. Over this window (<code>p&nbsp;≤&nbsp;97</code>) the real
+            weight <code>(log&nbsp;p)/√p&nbsp;≈&nbsp;0.46–0.74</code> is flat enough that the two
+            roughly coincide.</li>
+          <li><b>The hardest prime is 2.</b> <code>log&nbsp;2&nbsp;=&nbsp;0.693</code> sits in the
+            skirt of the bright central (zeroth-order) fringe, so 2 is dynamic-range-limited at
+            the bottom — the opposite end from the large primes, which are resolution-limited and
+            need many zeros.</li>
+          <li>Few zeros ⇒ broad, noisy peaks; like truncating a Fourier series, sharp impulses
+            broaden into sinc-like peaks.</li>
           <li>Screen axis is <b>logarithmic</b> in the prime coordinate; uniform slits.</li>
         </ul>
       </details>

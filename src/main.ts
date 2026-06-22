@@ -43,7 +43,7 @@ const state = {
   showCriticalLine: true,
   showProfile: false,
   profileGain: 16,
-  gamma: 0.55,
+  contrast: 0.55, // display tone-map exponent: brightness = |amp|^contrast (NOT the γₙ ordinates)
   showRays: true,
   showWavefronts: true,
   showPrimePowers: false,
@@ -156,11 +156,11 @@ xAxisGroup.add(makeLabel('Re(s)', 'note', new THREE.Vector3(SOURCE_X + 6, -1.4, 
 
 // Y axis — the imaginary axis: the vertical line at x = 0 (Re = 0), height = Im(s) = t.
 addLine(yAxisGroup, [new THREE.Vector3(0, -Y_MAX, 0), new THREE.Vector3(0, Y_MAX, 0)], 0x6f7fb8, 0.55);
-yAxisGroup.add(makeLabel('Y axis: Im(s)  (Re = 0)', 'note', new THREE.Vector3(-2.4, Y_MAX + 1.4, 0)));
+yAxisGroup.add(makeLabel('Y axis: Im(s)  (Re = 0)', 'note', new THREE.Vector3(-2.4, Y_MAX + 12, 0)));
 
 // Critical line — parallel to the Y axis but at x = Re(s) = ½; this is where the grating sits.
 addLine(criticalLineGroup, [new THREE.Vector3(CRITICAL_X, -Y_MAX, 0), new THREE.Vector3(CRITICAL_X, Y_MAX, 0)], 0x8fa6e0, 0.6);
-criticalLineGroup.add(makeLabel('critical line  Re(s) = ½', 'note', new THREE.Vector3(CRITICAL_X + 1.2, Y_MAX - 1, 0)));
+criticalLineGroup.add(makeLabel('critical line  Re(s) = ½', 'note', new THREE.Vector3(CRITICAL_X + 1.2, Y_MAX + 7, 0)));
 
 // A faint XY grid, pushed a hair behind z = 0 so nothing in the z = 0 plane
 // (source, axes, rays) coincides with a grid line and shimmers.
@@ -249,7 +249,7 @@ const screenMesh = (() => {
   scene.add(mesh);
   return mesh;
 })();
-scene.add(makeLabel('screen — far-field interference', 'note', new THREE.Vector3(0, Y_MAX + 1.5, 3)));
+scene.add(makeLabel('screen — far-field interference', 'note', new THREE.Vector3(0, Y_MAX + 17, 3)));
 
 const profileLine = (() => {
   const geo = new THREE.BufferGeometry();
@@ -274,8 +274,11 @@ function amplitude(v: number, n: number): number {
   return s / n; // |.| peaks ~0.2-0.3 at prime powers, ~0.03 background, 1 at v=0
 }
 
+// Tone-map the field amplitude for display: a gamma-style exponent that lifts the
+// faint prime fringes off the floor. This is why the screen shows |𝓕|^contrast, a
+// tone-mapped amplitude, rather than the squared intensity |𝓕|².
 function brightness(absAmp: number): number {
-  return Math.pow(Math.min(1, absAmp), state.gamma);
+  return Math.pow(Math.min(1, absAmp), state.contrast);
 }
 
 function colorFor(t: number, out: THREE.Color) {
@@ -377,15 +380,32 @@ function rebuildGrating() {
 //  Rebuild the screen colours, profile, peaks and labels
 // ===========================================================================
 const tmpColor = new THREE.Color();
+// Cached |amplitude| per screen sample. The cosine sum (the expensive part, n terms
+// × SCREEN_SAMPLES) depends only on the zero count, so we compute it once here and
+// reuse it whenever only the display knobs (Contrast / Profile height) change.
+const ampAbsCache = new Float32Array(SCREEN_SAMPLES);
+
+// Full recompute: re-evaluate the field. Call when the zero count changes.
 function rebuildPattern() {
   const n = state.zeroPairs;
+  for (let i = 0; i < SCREEN_SAMPLES; i++) {
+    const phi = -PHI_MAX + (2 * PHI_MAX * i) / (SCREEN_SAMPLES - 1);
+    const v = SPREAD * Math.sin(phi);
+    ampAbsCache[i] = Math.abs(amplitude(v, n));
+  }
+  remapPattern();   // colour + profile from the freshly cached field
+  rebuildMarks();
+}
+
+// Cheap re-tone-map: reuse the cached |amplitude| and only redo the tone map, colour
+// and profile geometry. Call when Contrast or Profile height changes — no cosine sum.
+function remapPattern() {
   const colAttr = screenMesh.geometry.getAttribute('color') as THREE.BufferAttribute;
   const profPos = profileLine.geometry.getAttribute('position') as THREE.BufferAttribute;
 
   for (let i = 0; i < SCREEN_SAMPLES; i++) {
     const phi = -PHI_MAX + (2 * PHI_MAX * i) / (SCREEN_SAMPLES - 1);
-    const v = SPREAD * Math.sin(phi);
-    const b = brightness(Math.abs(amplitude(v, n)));
+    const b = brightness(ampAbsCache[i]);
     colorFor(b, tmpColor);
     colAttr.setXYZ(i * 2, tmpColor.r, tmpColor.g, tmpColor.b);
     colAttr.setXYZ(i * 2 + 1, tmpColor.r, tmpColor.g, tmpColor.b);
@@ -397,8 +417,6 @@ function rebuildPattern() {
   colAttr.needsUpdate = true;
   profPos.needsUpdate = true;
   profileLine.geometry.computeBoundingSphere();
-
-  rebuildMarks();
 }
 
 const STAGGER_GAP = 0.05;   // rad: primes closer than this fan their labels outward
@@ -482,7 +500,7 @@ projChildren.insertBefore(projPanel, projChildren.firstChild); // top of the pan
 const fZeros = gui.addFolder('Zeros & primes');
 const zeroPairsCtrl = fZeros.add(state, 'zeroPairs', 1, ZETA_ZEROS.length, 1).name('Zero pairs (γₙ)  ◂ ▸')
   .onChange(() => { rebuildGrating(); rebuildPattern(); });
-fZeros.add(state, 'gamma', 0.3, 1.0, 0.01).name('Contrast').onChange(rebuildPattern);
+fZeros.add(state, 'contrast', 0.3, 1.0, 0.01).name('Contrast').onChange(remapPattern);
 fZeros.add(state, 'showPrimePowers').name('Prime powers (pᵏ)').onChange(rebuildMarks);
 fZeros.add(state, 'showInversePrimes').name('Mirror wing (1/p)').onChange(rebuildMarks);
 
@@ -490,7 +508,7 @@ const fLight = gui.addFolder('Light & screen');
 fLight.add(state, 'showRays').name('Incoming rays').onChange(rebuildGrating);
 fLight.add(state, 'showWavefronts').name('Wavefronts').onChange(() => wavefrontGroup.visible = state.showWavefronts);
 fLight.add(state, 'showProfile').name('Intensity profile').onChange(() => profileLine.visible = state.showProfile);
-fLight.add(state, 'profileGain', 0, 32, 1).name('Profile height').onChange(rebuildPattern);
+fLight.add(state, 'profileGain', 0, 32, 1).name('Profile height').onChange(remapPattern);
 fLight.close();
 
 const fRef = gui.addFolder('Reference frame');
